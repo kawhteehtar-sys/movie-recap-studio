@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Movie Recap Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#080b18;--panel:#111a2d;--line:#273650;--muted:#9aa9c2;--purple:#6655f5;--cyan:#19c6b1}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#22265a 0,transparent 55%),var(--bg);color:#f4f6ff;font:15px system-ui,"Noto Sans Myanmar",sans-serif}
+.wrap{max-width:900px;margin:auto;padding:22px 16px 60px}.brand{display:flex;align-items:center;gap:13px;margin:10px 0 22px}.logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#7658ff,#2b9bbd);display:grid;place-items:center;font-size:25px}.brand h1{font-size:22px;margin:0}.brand p{color:var(--muted);margin:3px 0 0;font-size:13px}
+.card{background:linear-gradient(145deg,#131d32,#0e1527);border:1px solid var(--line);border-radius:19px;padding:18px;margin:14px 0;box-shadow:0 12px 35px #0003}
+h2{font-size:17px;margin:0 0 13px}label{display:block;color:#cbd5e8;font-size:13px;margin:12px 0 7px}input,textarea,select{width:100%;border:1px solid #34435e;border-radius:12px;background:#0a1222;color:white;padding:13px;font:inherit;outline:none}input:focus,textarea:focus,select:focus{border-color:#8575ff}textarea{min-height:110px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}.tabs{display:flex;gap:8px}.tab{flex:1;border:1px solid var(--line);background:#101a2c;color:#aebbd0;padding:12px;border-radius:12px;font-weight:700}.tab.active{background:#5144d9;color:white;border-color:#7468ff}
+button{border:0;border-radius:13px;padding:13px 16px;font:700 14px system-ui;cursor:pointer}.primary{background:linear-gradient(100deg,#6d4cff,#148eaa);color:white;width:100%;font-size:16px;padding:16px}.secondary{background:#202d45;color:#e7edff}.small{padding:8px 11px;font-size:12px}.muted{color:var(--muted);font-size:12px;line-height:1.6}.status{padding:11px 13px;border-radius:12px;background:#0b1425;border:1px solid var(--line);color:#b7c6df;margin-top:12px;white-space:pre-wrap}.status.error{border-color:#85434e;color:#ffb5bd}.status.ok{border-color:#267d71;color:#8be5d5}.output{white-space:pre-wrap;line-height:1.85;font-size:15px;min-height:120px}.hidden{display:none}.pill{display:inline-block;background:#193b3b;color:#8ce8d9;padding:4px 9px;border-radius:30px;font-size:11px}.footer{text-align:center;color:#73819a;font-size:12px;margin:25px 0}
+a{color:#a99cff}
+</style>
+</head>
+<body><main class="wrap">
+<header class="brand"><div class="logo">▶</div><div><h1>Movie Recap Studio</h1><p>AI Movie Summary · Myanmar Script · Personal API Key</p></div><span class="pill">PERSONAL</span></header>
+
+<section class="card">
+<h2>🔑 Gemini API Key</h2>
+<label for="apiKey">ကိုယ်ပိုင် API Key</label>
+<div class="row"><input id="apiKey" type="password" placeholder="AIza..." autocomplete="off"><button class="secondary" id="toggleKey" type="button">ပြ</button></div>
+<div class="row" style="align-items:center;margin-top:10px"><button class="secondary small" id="saveKey" type="button">Key သိမ်းမယ်</button><button class="secondary small" id="clearKey" type="button">ဖျက်မယ်</button><a class="muted" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Gemini API Key ရယူရန် ↗</a></div>
+<p class="muted">Key ကို ဒီ Browser ရဲ့ localStorage ထဲမှာပဲ သိမ်းထားပါတယ်။ Shared/public computer မှာ မသိမ်းပါနဲ့။ Website ကို တခြားသူတွေသုံးရင် သူတို့ရဲ့ Key ကိုယ်တိုင်ထည့်ရပါမယ်။</p>
+</section>
+
+<section class="card">
+<h2>🎬 ဇာတ်ကား / ဗီဒီယို ထည့်ရန်</h2>
+<div class="tabs"><button class="tab active" id="ytTab" type="button">YouTube Link</button><button class="tab" id="fileTab" type="button">Video ဖိုင်</button></div>
+<div id="youtubePanel"><label for="ytUrl">Public YouTube URL</label><input id="ytUrl" placeholder="https://www.youtube.com/watch?v=..."><p class="muted">Public video များသာ အသုံးပြုနိုင်ပါတယ်။ Private / Unlisted video မရပါ။</p></div>
+<div id="filePanel" class="hidden"><label for="videoFile">Video ဖိုင်ရွေးရန်</label><input id="videoFile" type="file" accept="video/mp4,video/mpeg,video/mov,video/avi,video/webm,video/quicktime,video/x-flv,video/3gpp"><p class="muted">MP4, MOV, WEBM စတဲ့ format များ။ File API သုံးပြီး တိုက်ရိုက် Gemini သို့ upload လုပ်ပါတယ်။ Internet နှင့် Gemini API quota လိုအပ်ပါတယ်။</p></div>
+<div class="row"><div><label for="language">Script ဘာသာစကား</label><select id="language"><option value="မြန်မာ">မြန်မာ</option><option value="English">English</option></select></div><div><label for="style">Recap ပုံစံ</label><select id="style"><option>စိတ်ဝင်စားဖွယ် YouTube Movie Recap</option><option>ရုပ်ရှင်ဝေဖန်သုံးသပ်ချက်</option><option>တိုတိုရှင်းရှင်း ဇာတ်လမ်းအကျဉ်း</option><option>အသေးစိတ် ဇာတ်လမ်းပြန်ပြောခြင်း</option></select></div></div>
+<label for="extra">ထပ်မံညွှန်ကြားချက် (မဖြစ်မနေမဟုတ်)</label><textarea id="extra" placeholder="ဥပမာ - အစပိုင်းမှာ စိတ်ဝင်စားစရာ Hook ထည့်ပါ။ နာမည်တွေကို မပြောင်းပါနဲ့။"></textarea>
+<button class="primary" id="generate" type="button">✨ Recap Script ထုတ်မယ်</button>
+<div id="status" class="status">အသင့်ဖြစ်ပါပြီ။ API Key ထည့်ပြီး Video သို့မဟုတ် YouTube Link ရွေးပါ။</div>
+</section>
+
+<section class="card">
+<div class="row" style="align-items:center"><h2 style="margin:0;flex:1">📝 ထုတ်ပေးထားသော Script</h2><button class="secondary small" id="copy" type="button">Copy</button><button class="secondary small" id="download" type="button">TXT သိမ်းမယ်</button></div>
+<div id="result" class="output" style="margin-top:15px">ဒီနေရာမှာ AI ရဲ့ မြန်မာ Movie Recap Script ပေါ်လာပါမယ်။</div>
+<div class="row"><button class="secondary" id="speak" type="button">🔊 အသံဖတ်မယ်</button><button class="secondary" id="stopSpeak" type="button">အသံရပ်မယ်</button></div>
+<p class="muted">အသံဖတ်ခြင်းသည် ဖုန်း/Browser ရဲ့ Text-to-Speech အသံကို အသုံးပြုပါတယ်။ MP3 ဖိုင်ထုတ်ပေးခြင်း မဟုတ်ပါ။</p>
+</section>
+<div class="footer">Movie Recap Studio · Personal-use starter · API usage is subject to Google Gemini limits.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let mode="youtube", scriptText="";
+const API="https://generativelanguage.googleapis.com/v1beta";
+function status(msg,type=""){ $("status").textContent=msg;$("status").className="status "+type; }
+function setMode(m){mode=m;$("ytTab").classList.toggle("active",m==="youtube");$("fileTab").classList.toggle("active",m==="file");$("youtubePanel").classList.toggle("hidden",m!=="youtube");$("filePanel").classList.toggle("hidden",m!=="file");}
+$("ytTab").onclick=()=>setMode("youtube");$("fileTab").onclick=()=>setMode("file");
+$("toggleKey").onclick=()=>{$("apiKey").type=$("apiKey").type==="password"?"text":"password";};
+$("saveKey").onclick=()=>{const k=$("apiKey").value.trim();if(!k)return status("API Key ထည့်ပါ။","error");localStorage.setItem("mrs_gemini_key",k);status("ဒီ Browser ထဲမှာ API Key သိမ်းပြီးပါပြီ။","ok");};
+$("clearKey").onclick=()=>{localStorage.removeItem("mrs_gemini_key");$("apiKey").value="";status("သိမ်းထားတဲ့ Key ကို ဖျက်ပြီးပါပြီ။");};
+$("apiKey").value=localStorage.getItem("mrs_gemini_key")||"";
+function extractText(data){if(data.output_text)return data.output_text;let out=[];for(const step of (data.steps||[])){for(const c of (step.content||[])){if(c.text)out.push(c.text);}}return out.join("\n").trim();}
+async function uploadFile(file,key){
+ const start=await fetch("https://generativelanguage.googleapis.com/upload/v1beta/files",{method:"POST",headers:{"x-goog-api-key":key,"X-Goog-Upload-Protocol":"resumable","X-Goog-Upload-Command":"start","X-Goog-Upload-Header-Content-Length":String(file.size),"X-Goog-Upload-Header-Content-Type":file.type||"video/mp4","Content-Type":"application/json"},body:JSON.stringify({file:{display_name:file.name}})});
+ if(!start.ok)throw new Error("File upload စတင်မရပါ: "+await start.text());
+ const uploadUrl=start.headers.get("x-goog-upload-url");if(!uploadUrl)throw new Error("Upload URL မရရှိပါ။ Browser က upload header ကို ခွင့်မပြုနိုင်ပါ။");
+ const done=await fetch(uploadUrl,{method:"POST",headers:{"x-goog-upload-command":"upload, finalize","x-goog-upload-offset":"0","Content-Length":String(file.size)},body:file});
+ if(!done.ok)throw new Error("Video upload မအောင်မြင်ပါ: "+await done.text());
+ return (await done.json()).file;
+}
+async function waitActive(file,key){
+ for(let i=0;i<60;i++){if(file.state==="ACTIVE")return file;if(file.state==="FAILED")throw new Error("Gemini က Video processing မအောင်မြင်ပါ။");await new Promise(r=>setTimeout(r,3000));const r=await fetch(API+"/"+file.name,{headers:{"x-goog-api-key":key}});if(!r.ok)throw new Error(await r.text());file=await r.json();}
+ throw new Error("Video processing ကြာမြင့်နေပါတယ်။ ခဏနားပြီး ထပ်စမ်းပါ။");
+}
+$("generate").onclick=async()=>{
+ const key=$("apiKey").value.trim();if(!key)return status("Gemini API Key အရင်ထည့်ပါ။","error");
+ const prompt=`သင်သည် အတွေ့အကြုံရှိသော Movie Recap Script Writer ဖြစ်သည်။ ပေးထားသော ဗီဒီယိုကို သေချာလေ့လာပြီး ${$("language").value} ဘာသာဖြင့် ${$("style").value} ပုံစံ ဇာတ်ညွှန်းရေးပါ။ ဇာတ်လမ်းအစဉ်လိုက်ရေးပါ၊ ဇာတ်ကောင်အမည်များ မသေချာလျှင် မတီထွင်ပါနှင့်။ မမြင်ရ/မသိရသောအချက်ကို အမှန်အဖြစ် မရေးပါနှင့်။ စိတ်ဝင်စားဖွယ် Hook၊ သဘာဝကျသော ပြောစကား၊ အဆုံးသတ်ပါဝင်စေပါ။ အကြောင်းအရာကို တိုက်ရိုက်ကူးချခြင်းမဟုတ်ဘဲ ကိုယ်ပိုင်စကားဖြင့် အကျဉ်းချုပ်ပါ။\nထပ်ဆောင်းညွှန်ကြားချက်: ${$("extra").value||"မရှိပါ"}\nခေါင်းစဉ်၊ အဖွင့်၊ ဇာတ်လမ်းအကျဉ်း၊ အဆုံးသတ် ဟူ၍ စနစ်တကျဖွဲ့စည်းပါ။`;
+ try{
+ $("generate").disabled=true;$("generate").textContent="လုပ်ဆောင်နေသည်...";$("result").textContent="";
+ let video;
+ if(mode==="youtube"){
+ const url=$("ytUrl").value.trim();if(!/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url))throw new Error("မှန်ကန်တဲ့ YouTube URL ထည့်ပါ။");
+ video={type:"video",uri:url};
+ }else{
+ const f=$("videoFile").files[0];if(!f)throw new Error("Video ဖိုင်ရွေးပါ။");
+ status("Video ကို Gemini သို့ upload လုပ်နေပါတယ်...");let uploaded=await uploadFile(f,key);status("Video ကို AI ဖတ်ရှုနိုင်ရန် ပြင်ဆင်နေပါတယ်...");uploaded=await waitActive(uploaded,key);video={type:"video",uri:uploaded.uri,mime_type:uploaded.mimeType};
+ }
+ status("AI က ဇာတ်လမ်းကို လေ့လာပြီး Script ရေးနေပါတယ်...");
+ const res=await fetch(API+"/interactions",{method:"POST",headers:{"x-goog-api-key":key,"Content-Type":"application/json"},body:JSON.stringify({model:"gemini-3.8-flash",input:[video,{type:"text",text:prompt}]})});
+ const data=await res.json();if(!res.ok)throw new Error(data.error?.message||JSON.stringify(data));
+ scriptText=extractText(data);if(!scriptText)throw new Error("AI က Script မပြန်ပေးပါ။ Model/API response ကို စစ်ဆေးပါ။");
+ $("result").textContent=scriptText;status("ပြီးပါပြီ။ Script ကို Copy သို့မဟုတ် TXT သိမ်းနိုင်ပါတယ်။","ok");
+ }catch(e){status("အမှား: "+e.message,"error");}
+ finally{$("generate").disabled=false;$("generate").textContent="✨ Recap Script ထုတ်မယ်";}
+};
+$("copy").onclick=async()=>{if(!scriptText)return status("Copy လုပ်ရန် Script မရှိသေးပါ။","error");try{await navigator.clipboard.writeText(scriptText);status("Script ကို Copy လုပ်ပြီးပါပြီ။","ok");}catch(e){status("Copy မရပါ။ Script ကို ဖိနှိပ်ပြီး ရွေးချယ်ကူးယူပါ။","error");}};
+$("download").onclick=()=>{if(!scriptText)return status("သိမ်းရန် Script မရှိသေးပါ။","error");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([scriptText],{type:"text/plain;charset=utf-8"}));a.download="movie-recap-script.txt";a.click();URL.revokeObjectURL(a.href);};
+$("speak").onclick=()=>{if(!scriptText)return status("ဖတ်ရန် Script မရှိသေးပါ။","error");if(!("speechSynthesis"in window))return status("ဒီ Browser မှာ Text-to-Speech မရနိုင်ပါ။","error");speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(scriptText);u.lang=$("language").value==="မြန်မာ"?"my-MM":"en-US";speechSynthesis.speak(u);};
+$("stopSpeak").onclick=()=>speechSynthesis?.cancel();
+</script></body></html>
