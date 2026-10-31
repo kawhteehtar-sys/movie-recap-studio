@@ -40,7 +40,26 @@ a{color:#a99cff}
 <div class="row" style="align-items:center"><h2 style="margin:0;flex:1">📝 ထုတ်ပေးထားသော Script</h2><button class="secondary small" id="copy" type="button">Copy</button><button class="secondary small" id="download" type="button">TXT သိမ်းမယ်</button></div>
 <div id="result" class="output" style="margin-top:15px">ဒီနေရာမှာ AI ရဲ့ မြန်မာ Movie Recap Script ပေါ်လာပါမယ်။</div>
 <div class="row"><button class="secondary" id="speak" type="button">🔊 အသံဖတ်မယ်</button><button class="secondary" id="stopSpeak" type="button">အသံရပ်မယ်</button></div>
-<p class="muted">အသံဖတ်ခြင်းသည် ဖုန်း/Browser ရဲ့ Text-to-Speech အသံကို အသုံးပြုပါတယ်။ MP3 ဖိုင်ထုတ်ပေးခြင်း မဟုတ်ပါ။</p>
+<div class="row" style="margin-top:14px">
+  <div>
+    <label for="ttsVoice">မြန်မာအသံရွေးရန်</label>
+    <select id="ttsVoice">
+      <option value="my-MM-ThihaNeural">Thiha (အမျိုးသား)</option>
+      <option value="my-MM-NilarNeural">Nilar (အမျိုးသမီး)</option>
+    </select>
+  </div>
+  <div>
+    <label for="ttsRate">အသံမြန်နှုန်း</label>
+    <select id="ttsRate">
+      <option value="+0%">ပုံမှန်</option>
+      <option value="+5%" selected>နည်းနည်းမြန် (+5%)</option>
+      <option value="+10%">မြန် (+10%)</option>
+    </select>
+  </div>
+</div>
+<button class="primary" id="makeMp3" type="button" style="margin-top:12px">🎧 MP3 အသံဖိုင် ထုတ်မယ်</button>
+<audio id="ttsAudio" controls class="hidden" style="width:100%;margin-top:12px"></audio>
+<p class="muted">Thiha / Nilar အသံဖြင့် MP3 ထုတ်ရန် အင်တာနက်လိုအပ်ပါတယ်။</p>
 </section>
 <div class="footer">Movie Recap Studio · Personal-use starter · API usage is subject to Google Gemini limits.</div>
 </main>
@@ -92,5 +111,40 @@ $("generate").onclick=async()=>{
 $("copy").onclick=async()=>{if(!scriptText)return status("Copy လုပ်ရန် Script မရှိသေးပါ။","error");try{await navigator.clipboard.writeText(scriptText);status("Script ကို Copy လုပ်ပြီးပါပြီ။","ok");}catch(e){status("Copy မရပါ။ Script ကို ဖိနှိပ်ပြီး ရွေးချယ်ကူးယူပါ။","error");}};
 $("download").onclick=()=>{if(!scriptText)return status("သိမ်းရန် Script မရှိသေးပါ။","error");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([scriptText],{type:"text/plain;charset=utf-8"}));a.download="movie-recap-script.txt";a.click();URL.revokeObjectURL(a.href);};
 $("speak").onclick=()=>{if(!scriptText)return status("ဖတ်ရန် Script မရှိသေးပါ။","error");if(!("speechSynthesis"in window))return status("ဒီ Browser မှာ Text-to-Speech မရနိုင်ပါ။","error");speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(scriptText);u.lang=$("language").value==="မြန်မာ"?"my-MM":"en-US";speechSynthesis.speak(u);};
-$("stopSpeak").onclick=()=>speechSynthesis?.cancel();
+let ttsUrl="";
+$("makeMp3").onclick=async()=>{
+ if(!scriptText)return status("MP3 ထုတ်ရန် Script အရင်ထုတ်ပါ။","error");
+ try{
+  $("makeMp3").disabled=true;
+  $("makeMp3").textContent="အသံဖိုင် ဖန်တီးနေပါတယ်...";
+  status("မြန်မာအသံဖိုင် ဖန်တီးနေပါတယ်။ ခဏစောင့်ပါ...");
+  const r=await fetch("https://movie-recap-studio-muwl.onrender.com/api/tts",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    text:scriptText,
+    voice:$("ttsVoice").value,
+    rate:$("ttsRate").value
+   })
+  });
+  if(!r.ok)throw new Error(await r.text());
+  const blob=await r.blob();
+  if(ttsUrl)URL.revokeObjectURL(ttsUrl);
+  ttsUrl=URL.createObjectURL(blob);
+  const audio=$("ttsAudio");
+  audio.src=ttsUrl;
+  audio.classList.remove("hidden");
+  audio.load();
+  const a=document.createElement("a");
+  a.href=ttsUrl;
+  a.download="movie-recap-myanmar.mp3";
+  a.click();
+  status("MP3 အသံဖိုင် အဆင်သင့်ဖြစ်ပါပြီ။","ok");
+ }catch(e){
+  status("MP3 ထုတ်မရပါ: "+e.message,"error");
+ }finally{
+  $("makeMp3").disabled=false;
+  $("makeMp3").textContent="🎧 MP3 အသံဖိုင် ထုတ်မယ်";
+ }
+};
 </script></body></html>
