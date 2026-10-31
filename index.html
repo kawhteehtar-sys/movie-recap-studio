@@ -101,7 +101,7 @@ $("generate").onclick=async()=>{
  status("Video ကို Gemini သို့ upload လုပ်နေပါတယ်...");let uploaded=await uploadFile(f,key);status("Video ကို AI ဖတ်ရှုနိုင်ရန် ပြင်ဆင်နေပါတယ်...");uploaded=await waitActive(uploaded,key);video={type:"video",uri:uploaded.uri,mime_type:uploaded.mimeType};
  }
  status("AI က ဇာတ်လမ်းကို လေ့လာပြီး Script ရေးနေပါတယ်...");
- const res=await fetch(API+"/interactions",{method:"POST",headers:{"x-goog-api-key":key,"Content-Type":"application/json"},body:JSON.stringify({model:"gemini-3.6-flash",input:[video,{type:"text",text:prompt}]})});
+ const res=await fetch(API+"/interactions",{method:"POST",headers:{"x-goog-api-key":key,"Content-Type":"application/json"},body:JSON.stringify({model:"gemini-3.1-flash",input:[video,{type:"text",text:prompt}]})});
  const data=await res.json();if(!res.ok)throw new Error(data.error?.message||JSON.stringify(data));
  scriptText=extractText(data);if(!scriptText)throw new Error("AI က Script မပြန်ပေးပါ။ Model/API response ကို စစ်ဆေးပါ။");
  $("result").textContent=scriptText;status("ပြီးပါပြီ။ Script ကို Copy သို့မဟုတ် TXT သိမ်းနိုင်ပါတယ်။","ok");
