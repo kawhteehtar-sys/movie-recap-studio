@@ -338,17 +338,14 @@ async def auto_dub(
         raise HTTPException(status_code=500, detail=str(exc))
     finally:
         shutil.rmtree(workdir, ignore_errors=True)
-
-
 @app.post("/api/render-mp4")
 async def render_mp4(
     video: UploadFile = File(...),
     audio: UploadFile = File(...),
     blur_regions: str = Form("[]"),
     subtitles: str = Form("[]"),
-    audio_offset: float = Form(0),
-    audio_tempo: float = Form(1),
 ):
+
     workdir = tempfile.mkdtemp(prefix="movie_recap_")
     try:
         vp, ap, op = [
@@ -438,17 +435,7 @@ async def render_mp4(
             cmd += ["-filter_complex", ";".join(filters), "-map", current]
         else:
             cmd += ["-map", "0:v:0"]
-        offset = max(0, float(audio_offset))
-        tempo = float(audio_tempo)
-        if not .5 <= tempo <= 2:
-            raise ValueError("Audio tempo သည် 0.5x မှ 2x အတွင်းဖြစ်ရပါမည်")
-        audio_filter = []
-        if abs(tempo - 1) > .001:
-            audio_filter.append(f"atempo={tempo}")
-        if offset > 0:
-            audio_filter.append(f"adelay={int(offset * 1000)}:all=1")
-        if audio_filter:
-            cmd += ["-filter:a", ",".join(audio_filter)]
+     
         cmd += [
             "-map", "1:a:0", "-c:v", "libx264", "-preset", "medium", "-crf", "18",
             "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-shortest",
