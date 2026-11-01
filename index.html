@@ -306,14 +306,7 @@ $("addBlur").onclick=()=>{
 };
 $("deleteBlur").onclick=()=>{if(selectedBlur>=0){blurRegions.splice(selectedBlur,1);selectedBlur=-1;renderBlurs();}};
 
-$("addSubtitle").onclick=()=>{
- const text=$("subText").value.trim(),start=Number($("subStart").value),end=Number($("subEnd").value),size=Number($("subSize").value),bottom=Number($("subBottom").value);
- if(!text)return alert("စာတန်းရေးပါ");
- if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||end<=start)return alert("စချိန်နှင့်ဆုံးချိန် မှန်ကန်စွာထည့်ပါ");
- if(videoDuration&&end>videoDuration)return alert("စာတန်းဆုံးချိန်သည် Video ကြာချိန်ထက် မကျော်ရပါ");
- if(!Number.isFinite(size)||size<12||size>80||!Number.isFinite(bottom)||bottom<0||bottom>90)return alert("စာလုံးအရွယ် သို့မဟုတ် အောက်ခြေအကွာအဝေး မမှန်ပါ");
- subtitles.push({text,start,end,size,bottom});renderSubs();
-};
+
 function renderSubs(){
  $("subtitleList").innerHTML=subtitles.map((s,i)=>`<div class="item"><div class="itemhead"><b>${i+1}. ${escapeHtml(s.text.slice(0,45))}</b><button class="secondary small" type="button" data-subdel="${i}">ဖျက်</button></div><small>${s.start}s - ${s.end}s · ${s.size}px</small></div>`).join("");
  $("subtitleList").querySelectorAll("[data-subdel]").forEach(btn=>btn.onclick=()=>{subtitles.splice(+btn.dataset.subdel,1);renderSubs();});
@@ -334,7 +327,7 @@ $("exportMp4").onclick=async()=>{if(!editFile){setStatus("exportStatus","MP4 Exp
   $("exportMp4").disabled=true;setStatus("exportStatus","MP4 Render လုပ်နေပါတယ်။ Video အရွယ်အစားအလိုက် အချိန်ယူနိုင်ပါတယ်...");
   const fd=new FormData();fd.append("video",editFile,editFile.name);fd.append("audio",audioFile,"recap.mp3");
   fd.append("blur_regions",JSON.stringify(blurRegions));fd.append("subtitles",JSON.stringify(subtitles));
-  fd.append("audio_offset",String(Number($("audioOffset").value)||0));fd.append("audio_tempo",String(Number($("audioTempo").value)||1));
+  
   const r=await fetch(BACKEND+"/api/render-mp4",{method:"POST",body:fd});
   if(!r.ok){let detail=await r.text();throw Error(detail||`HTTP ${r.status}`);}
   const blob=await r.blob();if(!blob.size)throw Error("Backend က MP4 အလွတ်ပြန်ပေးပါတယ်");
