@@ -1,71 +1,316 @@
 <!doctype html>
 <html lang="my">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080b18">
 <title>Movie Recap Studio</title>
 <style>
 :root{color-scheme:dark;--bg:#080b18;--panel:#111a2d;--line:#273650;--muted:#9aa9c2;--purple:#6655f5;--cyan:#19c6b1}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#22265a 0,transparent 55%),var(--bg);color:#f4f6ff;font:15px system-ui,"Noto Sans Myanmar",sans-serif}
-.wrap{max-width:1000px;margin:auto;padding:18px 14px 55px}.brand{display:flex;align-items:center;gap:12px;margin:8px 0 20px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#7658ff,#2b9bbd);display:grid;place-items:center;font-size:24px}.brand h1{font-size:21px;margin:0}.brand p{color:var(--muted);margin:3px 0 0;font-size:12px}
-.card{background:linear-gradient(145deg,#131d32,#0e1527);border:1px solid var(--line);border-radius:18px;padding:16px;margin:13px 0;box-shadow:0 12px 35px #0003}h2{font-size:17px;margin:0 0 12px}label{display:block;color:#cbd5e8;font-size:13px;margin:11px 0 6px}
-input,textarea,select{width:100%;border:1px solid #34435e;border-radius:11px;background:#0a1222;color:white;padding:11px;font:inherit;outline:none}textarea{min-height:90px;resize:vertical}
-.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}button{border:0;border-radius:12px;padding:12px 14px;font:700 14px system-ui;cursor:pointer}.primary{background:linear-gradient(100deg,#6d4cff,#148eaa);color:white;width:100%;font-size:15px}.secondary{background:#202d45;color:#e7edff}.small{padding:8px 10px;font-size:12px}.muted{color:var(--muted);font-size:12px;line-height:1.6}.status{padding:10px 12px;border-radius:11px;background:#0b1425;border:1px solid var(--line);color:#b7c6df;margin-top:10px;white-space:pre-wrap}.status.error{border-color:#85434e;color:#ffb5bd}.status.ok{border-color:#267d71;color:#8be5d5}.output{white-space:pre-wrap;line-height:1.8;min-height:90px}.hidden{display:none!important}.tabs{display:flex;gap:8px}.tab{flex:1;background:#101a2c;color:#aebbd0;border:1px solid var(--line)}.tab.active{background:#5144d9;color:white}
-#previewWrap{position:relative;width:100%;max-height:65vh;background:#000;overflow:hidden;border-radius:12px;touch-action:pan-y}#preview{display:block;width:100%;max-height:65vh;object-fit:contain}#overlay{position:absolute;inset:0;pointer-events:none}.blurbox{position:absolute;border:2px solid #6ee7d8;background:#ffffff18;pointer-events:auto;touch-action:none;min-width:22px;min-height:18px}.blurbox.selected{border-color:#ffd34e}.handle{position:absolute;width:16px;height:16px;right:-7px;bottom:-7px;background:#ffd34e;border:2px solid #111;border-radius:50%;touch-action:none}.blurbox .tag{position:absolute;top:-20px;left:-2px;background:#163d3a;color:#aaffef;font-size:10px;padding:2px 5px;white-space:nowrap}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -20%,#22265a 0,transparent 55%),var(--bg);color:#f4f6ff;font:15px system-ui,"Noto Sans Myanmar",sans-serif}
+.wrap{max-width:1000px;margin:auto;padding:18px 14px 55px}
+.brand{display:flex;align-items:center;gap:12px;margin:8px 0 20px}
+.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#7658ff,#2b9bbd);display:grid;place-items:center;font-size:24px}
+.brand h1{font-size:21px;margin:0}.brand p{color:var(--muted);margin:3px 0 0;font-size:12px}
+.card{background:linear-gradient(145deg,#131d32,#0e1527);border:1px solid var(--line);border-radius:18px;padding:16px;margin:13px 0;box-shadow:0 12px 35px #0003}
+h2{font-size:17px;margin:0 0 12px}
+label{display:block;color:#cbd5e8;font-size:13px;margin:11px 0 6px}
+input,textarea,select{width:100%;border:1px solid #34435e;border-radius:11px;background:#0a1222;color:white;padding:11px;font:inherit;outline:none}
+textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+button{border:0;border-radius:12px;padding:12px 14px;font:700 14px system-ui;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+.primary{background:linear-gradient(100deg,#6d4cff,#148eaa);color:white;width:100%;font-size:15px}
+.secondary{background:#202d45;color:#e7edff}.small{padding:8px 10px;font-size:12px}
+.muted{color:var(--muted);font-size:12px;line-height:1.6}
+.status{padding:10px 12px;border-radius:11px;background:#0b1425;border:1px solid var(--line);color:#b7c6df;margin-top:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.status.error{border-color:#85434e;color:#ffb5bd}.status.ok{border-color:#267d71;color:#8be5d5}
+.output{white-space:pre-wrap;line-height:1.8;min-height:90px;overflow-wrap:anywhere}
+.hidden{display:none!important}.tabs{display:flex;gap:8px}
+.tab{flex:1;background:#101a2c;color:#aebbd0;border:1px solid var(--line)}
+.tab.active{background:#5144d9;color:white}
+#previewWrap{position:relative;width:100%;background:#000;overflow:hidden;border-radius:12px;touch-action:pan-y}
+#preview{display:block;width:100%;height:auto;max-height:65vh;object-fit:contain}
+#overlay{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.blurbox{position:absolute;border:2px solid #6ee7d8;background:#ffffff18;backdrop-filter:blur(var(--blur-strength,12px));-webkit-backdrop-filter:blur(var(--blur-strength,12px));pointer-events:auto;touch-action:none;min-width:22px;min-height:18px}
+.blurbox.selected{border-color:#ffd34e}
+.blurbox .tag{position:absolute;left:0;top:0;background:#087f78;color:white;font-size:10px;padding:2px 5px;pointer-events:none}
+.blurbox .handle{position:absolute;right:-2px;bottom:-2px;width:18px;height:18px;border-radius:50%;background:#ffd34e;border:2px solid #171717;touch-action:none}
 .subtitle-preview{position:absolute;left:50%;bottom:7%;transform:translateX(-50%);max-width:92%;color:#ffeb00;font-weight:800;text-align:center;white-space:pre-wrap;line-height:1.35;-webkit-text-stroke:1px #000;text-shadow:2px 2px 0 #000,-2px 2px 0 #000,2px -2px 0 #000,-2px -2px 0 #000;pointer-events:none}
-.item{border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0;background:#0a1222}.itemhead{display:flex;justify-content:space-between;gap:8px;align-items:center}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:600px){.grid2{grid-template-columns:1fr}.card{padding:13px}}
-</style></head>
-<body><main class="wrap">
+.item{border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0;background:#0a1222}
+.itemhead{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+a{color:#83d9ed}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}.card{padding:13px}.brand h1{font-size:19px}}
+</style>
+</head>
+<body>
+<main class="wrap">
 <header class="brand"><div class="logo">▶</div><div><h1>Movie Recap Studio</h1><p>မြန်မာ Movie Recap · Voice · Blur · Subtitle · MP4</p></div></header>
 
-<section class="card"><h2>🔑 Gemini API Key</h2><label>ကိုယ်ပိုင် Gemini API Key</label><div class="row"><input id="apiKey" type="password" placeholder="AIza..." autocomplete="off"><button class="secondary" id="toggleKey">ပြ</button></div><div class="row" style="margin-top:8px"><button class="secondary small" id="saveKey">Key သိမ်းမယ်</button><button class="secondary small" id="clearKey">ဖျက်မယ်</button><a class="muted" href="https://aistudio.google.com/apikey" target="_blank">API Key ရယူရန် ↗</a></div><p class="muted">Key ကို ဒီ Browser ထဲမှာသာ သိမ်းပါ။ အခြားသူနှင့် မမျှဝေပါနှင့်။</p></section>
+<section class="card">
+<h2>🔑 Gemini API Key</h2>
+<label for="apiKey">ကိုယ်ပိုင် Gemini API Key</label>
+<div class="row"><input id="apiKey" type="password" placeholder="AIza..." autocomplete="off"><button class="secondary" id="toggleKey" type="button">ပြ</button></div>
+<div class="row" style="margin-top:8px"><button class="secondary small" id="saveKey" type="button">Key သိမ်းမယ်</button><button class="secondary small" id="clearKey" type="button">ဖျက်မယ်</button><a class="muted" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">API Key ရယူရန် ↗</a></div>
+<p class="muted">Key ကို ဒီ Browser ထဲမှာသာ သိမ်းပါ။ HTML ကို အများသုံးတင်မည်ဆိုလျှင် ကိုယ်ပိုင် Key မထည့်ထားပါနှင့်။</p>
+</section>
 
-<section class="card"><h2>🎬 ဇာတ်ကားထည့်ရန်</h2><div class="tabs"><button class="tab active" id="ytTab">YouTube Link</button><button class="tab" id="fileTab">Video ဖိုင်</button></div>
-<div id="youtubePanel"><label>YouTube URL</label><input id="ytUrl" placeholder="https://www.youtube.com/watch?v=..."><p class="muted">YouTube URL ဖြင့် Script ထုတ်နိုင်သည်။ MP4 Export အတွက် Video ဖိုင်ကိုလည်း တင်ရမည်။</p></div>
-<div id="filePanel" class="hidden"><label>Video ဖိုင်ရွေးရန်</label><input id="videoFile" type="file" accept="video/*"></div>
-<div class="row"><div><label>Script ဘာသာစကား</label><select id="language"><option value="မြန်မာ">မြန်မာ</option><option value="English">English</option></select></div><div><label>Recap ပုံစံ</label><select id="style"><option>စိတ်ဝင်စားဖွယ် YouTube Movie Recap</option><option>အသေးစိတ် ဇာတ်လမ်းပြန်ပြောခြင်း</option><option>တိုတိုရှင်းရှင်း ဇာတ်လမ်းအကျဉ်း</option></select></div></div>
-<label>ထပ်ဆောင်းညွှန်ကြားချက်</label><textarea id="extra" placeholder="Hook ထည့်ပါ၊ ဇာတ်ကောင်နာမည်မပြောင်းပါနဲ့..."></textarea><button class="primary" id="generate">✨ Recap Script ထုတ်မယ်</button><div id="status" class="status">API Key ထည့်ပြီး Video သို့မဟုတ် YouTube Link ရွေးပါ။</div></section>
+<section class="card">
+<h2>🎬 ဇာတ်ကားထည့်ရန်</h2>
+<div class="tabs"><button class="tab active" id="ytTab" type="button">YouTube Link</button><button class="tab" id="fileTab" type="button">Video ဖိုင်</button></div>
+<div id="youtubePanel"><label for="ytUrl">YouTube URL</label><input id="ytUrl" placeholder="https://www.youtube.com/watch?v=..."><p class="muted">YouTube URL ဖြင့် Script ထုတ်နိုင်သည်။ MP4 Export အတွက် Video ဖိုင်ကိုလည်း တင်ရမည်။</p></div>
+<div id="filePanel" class="hidden"><label for="videoFile">Video ဖိုင်ရွေးရန်</label><input id="videoFile" type="file" accept="video/*"></div>
+<div class="row"><div><label for="language">Script ဘာသာစကား</label><select id="language"><option value="မြန်မာ">မြန်မာ</option><option value="English">English</option></select></div><div><label for="style">Recap ပုံစံ</label><select id="style"><option>စိတ်ဝင်စားဖွယ် YouTube Movie Recap</option><option>အသေးစိတ် ဇာတ်လမ်းပြန်ပြောခြင်း</option><option>တိုတိုရှင်းရှင်း ဇာတ်လမ်းအကျဉ်း</option></select></div></div>
+<label for="extra">ထပ်ဆောင်းညွှန်ကြားချက်</label><textarea id="extra" placeholder="Hook ထည့်ပါ၊ ဇာတ်ကောင်နာမည်မပြောင်းပါနဲ့..."></textarea>
+<button class="primary" id="generate" type="button">✨ Recap Script ထုတ်မယ်</button>
+<div id="status" class="status">API Key ထည့်ပြီး Video သို့မဟုတ် YouTube Link ရွေးပါ။</div>
+</section><section class="card">
+<h2>🎬 ဇာတ်ကားထည့်ရန်</h2>
+<div class="tabs"><button class="tab active" id="ytTab" type="button">YouTube Link</button><button class="tab" id="fileTab" type="button">Video ဖိုင်</button></div>
+<div id="youtubePanel"><label for="ytUrl">YouTube URL</label><input id="ytUrl" placeholder="https://www.youtube.com/watch?v=..."><p class="muted">YouTube URL ဖြင့် Script ထုတ်နိုင်သည်။ MP4 Export အတွက် Video ဖိုင်ကိုလည်း တင်ရမည်။</p></div>
+<div id="filePanel" class="hidden"><label for="videoFile">Video ဖိုင်ရွေးရန်</label><input id="videoFile" type="file" accept="video/*"></div>
+<div class="row"><div><label for="language">Script ဘာသာစကား</label><select id="language"><option value="မြန်မာ">မြန်မာ</option><option value="English">English</option></select></div><div><label for="style">Recap ပုံစံ</label><select id="style"><option>စိတ်ဝင်စားဖွယ် YouTube Movie Recap</option><option>အသေးစိတ် ဇာတ်လမ်းပြန်ပြောခြင်း</option><option>တိုတိုရှင်းရှင်း ဇာတ်လမ်းအကျဉ်း</option></select></div></div>
+<label for="extra">ထပ်ဆောင်းညွှန်ကြားချက်</label><textarea id="extra" placeholder="Hook ထည့်ပါ၊ ဇာတ်ကောင်နာမည်မပြောင်းပါနဲ့..."></textarea>
+<button class="primary" id="generate" type="button">✨ Recap Script ထုတ်မယ်</button>
+<div id="status" class="status">API Key ထည့်ပြီး Video သို့မဟုတ် YouTube Link ရွေးပါ။</div>
+</section>
 
-<section class="card"><div class="row"><h2 style="flex:1">📝 Recap Script</h2><button class="secondary small" id="copy">Copy</button><button class="secondary small" id="download">TXT သိမ်းမယ်</button></div><div id="result" class="output">AI Script ဒီနေရာမှာ ပေါ်လာပါမယ်။</div>
-<div class="row"><div><label>မြန်မာအသံ</label><select id="ttsVoice"><option value="my-MM-ThihaNeural">Thiha (အမျိုးသား)</option><option value="my-MM-NilarNeural">Nilar (အမျိုးသမီး)</option></select></div><div><label>အသံမြန်နှုန်း</label><select id="ttsRate"><option value="+0%">ပုံမှန်</option><option value="+5%">+5%</option><option value="+10%" selected>+10%</option></select></div></div><button class="primary" id="makeMp3" style="margin-top:10px">🎧 MP3 ထုတ်မယ်</button><audio id="ttsAudio" controls class="hidden" style="width:100%;margin-top:10px"></audio></section>
+<section class="card">
+<div class="row"><h2 style="flex:1">📝 Recap Script</h2><button class="secondary small" id="copy" type="button">Copy</button><button class="secondary small" id="download" type="button">TXT သိမ်းမယ်</button></div>
+<div id="result" class="output">AI Script ဒီနေရာမှာ ပေါ်လာပါမယ်။</div>
+<div class="row"><div><label for="ttsVoice">မြန်မာအသံ</label><select id="ttsVoice"><option value="my-MM-ThihaNeural">Thiha (အမျိုးသား)</option><option value="my-MM-NilarNeural">Nilar (အမျိုးသမီး)</option></select></div><div><label for="ttsRate">အသံမြန်နှုန်း</label><select id="ttsRate"><option value="+0%">ပုံမှန်</option><option value="+5%">+5%</option><option value="+10%" selected>+10%</option></select></div></div>
+<button class="primary" id="makeMp3" type="button" style="margin-top:10px">🎧 MP3 ထုတ်မယ်</button>
+<audio id="ttsAudio" controls class="hidden" style="width:100%;margin-top:10px"></audio>
+</section>
 
-<section class="card"><h2>🎞️ Video Preview & Blur Editor</h2><label>MP4 Export အတွက် Video ဖိုင်ရွေးပါ</label><input id="editVideo" type="file" accept="video/*"><div id="previewWrap" class="hidden" style="margin-top:12px"><video id="preview" controls playsinline></video><div id="overlay"><div id="subtitlePreview" class="subtitle-preview"></div></div></div>
-<div class="row" style="margin-top:10px"><button class="secondary" id="addBlur">＋ Blur Box ထည့်မယ်</button><button class="secondary" id="deleteBlur">ရွေးထားတာ ဖျက်မယ်</button></div><div id="blurList"></div><p class="muted">Blur Box ကို လက်နဲ့ဆွဲရွှေ့နိုင်ပြီး အောက်ညာထောင့်က အဝါရောင်စက်ကို ဆွဲ၍ အရွယ်ပြောင်းနိုင်သည်။</p></section>
+<section class="card">
+<h2>🎞️ Video Preview & Blur Editor</h2>
+<label for="editVideo">MP4 Export အတွက် Video ဖိုင်ရွေးပါ</label><input id="editVideo" type="file" accept="video/*">
+<div id="previewWrap" class="hidden" style="margin-top:12px"><video id="preview" controls playsinline></video><div id="overlay"><div id="subtitlePreview" class="subtitle-preview"></div></div></div>
+<div class="row" style="margin-top:10px"><button class="secondary" id="addBlur" type="button">＋ Blur Box ထည့်မယ်</button><button class="secondary" id="deleteBlur" type="button">ရွေးထားတာ ဖျက်မယ်</button></div>
+<div id="blurList"></div><p class="muted">Blur Box ကို လက်နဲ့ဆွဲရွှေ့နိုင်ပြီး အောက်ညာထောင့်က အဝါရောင်စက်ကို ဆွဲ၍ အရွယ်ပြောင်းနိုင်သည်။</p>
+</section>
 
-<section class="card"><h2>🟨 မြန်မာစာတန်း (အဝါရောင် + အနက် Outline)</h2><label>စာတန်းစာသား</label><textarea id="subText" placeholder="ဒီနေရာမှာ စာတန်းရေးပါ"></textarea><div class="grid2"><div><label>စတင်ချိန် (စက္ကန့်)</label><input id="subStart" type="number" min="0" step="0.1" value="0"></div><div><label>ဆုံးချိန် (စက္ကန့်)</label><input id="subEnd" type="number" min="0" step="0.1" value="5"></div><div><label>စာလုံးအရွယ်</label><input id="subSize" type="number" min="12" max="80" value="30"></div><div><label>အောက်ခြေမှ အကွာအဝေး (%)</label><input id="subBottom" type="number" min="0" max="90" value="7"></div></div><button class="secondary" id="addSubtitle" style="margin-top:10px">＋ စာတန်းထည့်မယ်</button><div id="subtitleList"></div><p class="muted">စာတန်းများကို အချိန်အပိုင်းအခြားအလိုက် ဗီဒီယိုထဲတွင် ထည့်သွင်း Export လုပ်နိုင်သည်။</p></section>
+<section class="card">
+<h2>🟨 မြန်မာစာတန်း (အဝါရောင် + အနက် Outline)</h2>
+<label for="subText">စာတန်းစာသား</label><textarea id="subText" placeholder="ဒီနေရာမှာ စာတန်းရေးပါ"></textarea>
+<div class="grid2"><div><label for="subStart">စတင်ချိန် (စက္ကန့်)</label><input id="subStart" type="number" min="0" step="0.1" value="0"></div><div><label for="subEnd">ဆုံးချိန် (စက္ကန့်)</label><input id="subEnd" type="number" min="0" step="0.1" value="5"></div><div><label for="subSize">စာလုံးအရွယ်</label><input id="subSize" type="number" min="12" max="80" value="30"></div><div><label for="subBottom">အောက်ခြေမှ အကွာအဝေး (%)</label><input id="subBottom" type="number" min="0" max="90" value="7"></div></div>
+<button class="secondary" id="addSubtitle" type="button" style="margin-top:10px">＋ စာတန်းထည့်မယ်</button><div id="subtitleList"></div>
+<p class="muted">စာတန်းများကို အချိန်အပိုင်းအခြားအလိုက် ဗီဒီယိုထဲတွင် ထည့်သွင်း Export လုပ်နိုင်သည်။</p>
+</section>
 
-<section class="card"><h2>⏱️ အသံနှင့် စကားပြောချိန် ညှိရန်</h2><p class="muted">MP3 ကို Video နှင့် အချိန်တူအောင် ချိန်ညှိရန် Start offset ထည့်နိုင်သည်။ အလိုအလျောက် ဇာတ်ကောင်စကားပြောချိန်သိခြင်း မပါသေးပါ။</p><label>မြန်မာအသံ စတင်မည့် Offset (စက္ကန့်)</label><input id="audioOffset" type="number" step="0.1" value="0"><label>အသံမြန်နှုန်း (FFmpeg atempo)</label><select id="audioTempo"><option value="1">မပြောင်း (1.0x)</option><option value="1.05">1.05x</option><option value="1.1">1.10x</option><option value="0.95">0.95x</option></select></section>
+<section class="card">
+<h2>⏱️ အသံနှင့် စကားပြောချိန် ညှိရန်</h2><p class="muted">MP3 ကို Video နှင့် အချိန်တူအောင် ချိန်ညှိရန် Start offset ထည့်နိုင်သည်။ အလိုအလျောက် ဇာတ်ကောင်စကားပြောချိန်သိခြင်း မပါသေးပါ။</p>
+<label for="audioOffset">မြန်မာအသံ စတင်မည့် Offset (စက္ကန့်)</label><input id="audioOffset" type="number" step="0.1" value="0">
+<label for="audioTempo">အသံမြန်နှုန်း (FFmpeg atempo)</label><select id="audioTempo"><option value="1">မပြောင်း (1.0x)</option><option value="1.05">1.05x</option><option value="1.1">1.10x</option><option value="0.95">0.95x</option></select>
+</section>
 
-<section class="card"><h2>📦 MP4 ထုတ်ရန်</h2><p class="muted">Original movie audio ကို ဖယ်ပြီး မြန်မာ MP3 အသံကို ထည့်ပေးမည်။ Blur နဲ့ စာတန်းများကို Video ပေါ်မှာ တင်ပေးမည်။</p><button class="primary" id="exportMp4">🚀 MP4 Export လုပ်မယ်</button><div id="exportStatus" class="status">Video နှင့် MP3 ဖိုင်ရွေးပြီးမှ Export လုပ်နိုင်ပါမယ်။</div><a id="downloadMp4" class="hidden" download="movie-recap.mp4">MP4 ဖိုင်ဒေါင်းလုဒ်လုပ်ရန်</a></section>
+<section class="card">
+<h2>📦 MP4 ထုတ်ရန်</h2><p class="muted">Original movie audio ကို ဖယ်ပြီး မြန်မာ MP3 အသံကို ထည့်ပေးမည်။ Blur နဲ့ စာတန်းများကို Video ပေါ်မှာ တင်ပေးမည်။</p>
+<button class="primary" id="exportMp4" type="button">🚀 MP4 Export လုပ်မယ်</button><div id="exportStatus" class="status">Video နှင့် MP3 ဖိုင်ရွေးပြီးမှ Export လုပ်နိုင်ပါမယ်။</div>
+<a id="downloadMp4" class="hidden" download="movie-recap.mp4">MP4 ဖိုင်ဒေါင်းလုဒ်လုပ်ရန်</a>
+</section>
 <div class="muted" style="text-align:center">Movie Recap Studio · Render အတွက် Backend Server လိုအပ်သည်။</div>
 </main>
 <script>
-const $=id=>document.getElementById(id), API="https://generativelanguage.googleapis.com/v1beta", BACKEND="https://movie-recap-studio-muwl.onrender.com";
-let mode="youtube", scriptText="", ttsBlob=null, videoUrl="", editFile=null, audioFile=null, blurRegions=[], selectedBlur=-1, subtitles=[], videoDuration=0;
-function msg(t,type=""){ $("status").textContent=t;$("status").className="status "+type}
+"use strict";
+const $=id=>document.getElementById(id);
+const API="https://generativelanguage.googleapis.com/v1beta";
+const BACKEND="https://movie-recap-studio-muwl.onrender.com";
+let mode="youtube",scriptText="",ttsBlob=null,videoUrl="",editFile=null,audioFile=null;
+let blurRegions=[],selectedBlur=-1,subtitles=[],videoDuration=0,mp3Url="",mp4Url="";
+
+function msg(t,type=""){ $("status").textContent=t;$("status").className="status "+type; }
+function setStatus(id,t,type=""){const el=$(id);el.textContent=t;el.className="status "+type;}
+function setMode(m){mode=m;$("ytTab").classList.toggle("active",m==="youtube");$("fileTab").classList.toggle("active",m==="file");$("youtubePanel").classList.toggle("hidden",m!=="youtube");$("filePanel").classList.toggle("hidden",m!=="file");}
+function revokeUrl(url){if(url)URL.revokeObjectURL(url);}
 $("apiKey").value=localStorage.getItem("mrs_gemini_key")||"";
 $("toggleKey").onclick=()=>$("apiKey").type=$("apiKey").type==="password"?"text":"password";
-$("saveKey").onclick=()=>{let k=$("apiKey").value.trim();if(!k)return msg("API Key ထည့်ပါ","error");localStorage.setItem("mrs_gemini_key",k);msg("Key သိမ်းပြီးပါပြီ","ok")};
-$("clearKey").onclick=()=>{localStorage.removeItem("mrs_gemini_key");$("apiKey").value="";msg("Key ဖျက်ပြီးပါပြီ")};
-function setMode(m){mode=m;$("ytTab").classList.toggle("active",m==="youtube");$("fileTab").classList.toggle("active",m==="file");$("youtubePanel").classList.toggle("hidden",m!=="youtube");$("filePanel").classList.toggle("hidden",m!=="file")}
+$("saveKey").onclick=()=>{const k=$("apiKey").value.trim();if(!k)return msg("API Key ထည့်ပါ","error");localStorage.setItem("mrs_gemini_key",k);msg("Key သိမ်းပြီးပါပြီ","ok");};
+$("clearKey").onclick=()=>{localStorage.removeItem("mrs_gemini_key");$("apiKey").value="";msg("Key ဖျက်ပြီးပါပြီ");};
 $("ytTab").onclick=()=>setMode("youtube");$("fileTab").onclick=()=>setMode("file");
-function extractText(d){if(d.output_text)return d.output_text;let a=[];(d.steps||[]).forEach(s=>(s.content||[]).forEach(c=>{if(c.text)a.push(c.text)}));return a.join("\n").trim()}
-async function uploadFile(f,key){let s=await fetch("https://generativelanguage.googleapis.com/upload/v1beta/files",{method:"POST",headers:{"x-goog-api-key":key,"X-Goog-Upload-Protocol":"resumable","X-Goog-Upload-Command":"start","X-Goog-Upload-Header-Content-Length":String(f.size),"X-Goog-Upload-Header-Content-Type":f.type||"video/mp4","Content-Type":"application/json"},body:JSON.stringify({file:{display_name:f.name}})});if(!s.ok)throw Error(await s.text());let u=s.headers.get("x-goog-upload-url");if(!u)throw Error("Gemini Upload URL မရပါ");let r=await fetch(u,{method:"POST",headers:{"x-goog-upload-command":"upload, finalize","x-goog-upload-offset":"0"},body:f});if(!r.ok)throw Error(await r.text());return (await r.json()).file}
-async function waitActive(f,key){for(let i=0;i<60;i++){if(f.state==="ACTIVE")return f;if(f.state==="FAILED")throw Error("Video processing failed");await new Promise(r=>setTimeout(r,3000));let r=await fetch(API+"/"+f.name,{headers:{"x-goog-api-key":key}});if(!r.ok)throw Error(await r.text());f=await r.json()}throw Error("Video processing အချိန်ကြာနေပါတယ်")}
-$("generate").onclick=async()=>{let key=$("apiKey").value.trim();if(!key)return msg("Gemini API Key ထည့်ပါ","error");try{$("generate").disabled=true;let v;if(mode==="file"){let f=$("videoFile").files[0];if(!f)throw Error("Video ဖိုင်ရွေးပါ");msg("Video Upload လုပ်နေပါတယ်");let up=await waitActive(await uploadFile(f,key),key);v={type:"video",uri:up.uri,mime_type:up.mimeType}}else{let u=$("ytUrl").value.trim();if(!/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(u))throw Error("YouTube URL မှန်ကန်စွာထည့်ပါ");v={type:"video",uri:u}}
-msg("AI Script ရေးနေပါတယ်");let p=`သင်သည် Movie Recap ဇာတ်လမ်းပြောသူဖြစ်သည်။ ပေးထားသောဗီဒီယိုကို လေ့လာပြီး ${$("language").value} ဘာသာဖြင့် ${$("style").value} ပုံစံရေးပါ။ ဇာတ်လမ်းပြောမည့်စာသားသက်သက်သာထုတ်ပါ။ ဗီဒီယိုထဲမပါသောအဖြစ်အပျက်မတီထွင်ပါနှင့်။ ဇာတ်ကောင်အမည်မသေချာလျှင် မတီထွင်ပါနှင့်။ သဘာဝကျသောစကားပြောပုံစံဖြင့်ရေးပါ။ ထပ်ဆောင်းညွှန်ကြားချက် ${$("extra").value||"မရှိပါ"}`;
-let r=await fetch(API+"/interactions",{method:"POST",headers:{"x-goog-api-key":key,"Content-Type":"application/json"},body:JSON.stringify({model:"gemini-3.1-flash-lite",input:[v,{type:"text",text:p}]})});let d=await r.json();if(!r.ok)throw Error(d.error?.message||JSON.stringify(d));scriptText=extractText(d);if(!scriptText)throw Error("Script မရရှိပါ");$("result").textContent=scriptText;msg("Script ရပါပြီ","ok")
-}catch(e){msg("အမှား: "+e.message,"error")}finally{$("generate").disabled=false}};
-$("copy").onclick=async()=>{if(!scriptText)return msg("Script မရှိသေးပါ");try{await navigator.clipboard.writeText(scriptText);msg("Copy လုပ်ပြီးပါပြီ","ok")}catch(e){msg("Copy မရပါ")}};
-$("download").onclick=()=>{if(!scriptText)return;let a=document.createElement("a"),u=URL.createObjectURL(new Blob([scriptText],{type:"text/plain;charset=utf-8"}));a.href=u;a.download="movie-recap.txt";a.click();URL.revokeObjectURL(u)};
-$("makeMp3").onclick=async()=>{if(!scriptText)return msg("Script အရင်ထုတ်ပါ");try{$("makeMp3").disabled=true;msg("MP3 ဖန်တီးနေပါတယ်");let r=await fetch(BACKEND+"/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:scriptText,voice:$("ttsVoice").value,rate:$("ttsRate").value})});if(!r.ok)throw Error(await r.text());ttsBlob=await r.blob();audioFile=new File([ttsBlob],"recap.mp3",{type:"audio/mpeg"});let a=$("ttsAudio");a.src=URL.createObjectURL(ttsBlob);a.classList.remove("hidden");let dl=document.createElement("a");dl.href=a.src;dl.download="movie-recap-myanmar.mp3";dl.click();msg("MP3 အဆင်သင့်ပါပြီ","ok")}catch(e){msg("MP3 မရပါ: "+e.message,"error")}finally{$("makeMp3").disabled=false}};
-$("editVideo").onchange=()=>{editFile=$("editVideo").files[0];if(!editFile)return;if(videoUrl)URL.revokeObjectURL(videoUrl);videoUrl=URL.createObjectURL(editFile);$("preview").src=videoUrl;$("previewWrap").classList.remove("hidden");$("preview").onloadedmetadata=()=>{videoDuration=$("preview").duration;$("subEnd").value=Math.min(5,videoDuration).toFixed(1)}};
-function renderBlurs(){let ov=$("overlay");ov.querySelectorAll(".blurbox").forEach(x=>x.remove());blurRegions.forEach((b,i)=>{let el=document.createElement("div");el.className="blurbox"+(i===selectedBlur?" selected":"");el.style.left=b.x*100+"%";el.style.top=b.y*100+"%";el.style.width=b.width*100+"%";el.style.height=b.height*100+"%";el.innerHTML=`<span class="tag">Blur ${i+1}</span><span class="handle"></span>`;ov.appendChild(el);el.addEventListener("pointerdown",e=>{if(e.target.classList.contains("handle"))return;selectedBlur=i;dragBlur(e,i,false)});el.querySelector(".handle").addEventListener("pointerdown",e=>{e.stopPropagation();selectedBlur=i;dragBlur(e,i,true)});el.addEventListener("click",()=>{selectedBlur=i;renderBlurs()})});$("blurList").innerHTML=blurRegions.map((b,i)=>`<div class="item"><div class="itemhead"><b>Blur ${i+1}</b><button class="secondary small" data-del="${i}">ဖျက်</button></div><label>Blur အား (${b.strength})</label><input type="range" min="1" max="100" value="${b.strength}" data-strength="${i}"></div>`).join("");$("blurList").querySelectorAll("[data-del]").forEach(x=>x.onclick=()=>{blurRegions.splice(+x.dataset.del,1);selectedBlur=-1;renderBlurs()});$("blurList").querySelectorAll("[data-strength]").forEach(x=>x.oninput=()=>{blurRegions[+x.dataset.strength].strength=+x.value;x.previousElementSibling.textContent="Blur အား ("+x.value+")"})}
-function dragBlur(e,i,resize){e.preventDefault();let ov=$("overlay"),r=ov.getBoundingClientRect(),b=blurRegions[i],sx=e.clientX,sy=e.clientY,old={...b};e.target.setPointerCapture(e.pointerId);function move(ev){let dx=(ev.clientX-sx)/r.width,dy=(ev.clientY-sy)/r.height;if(resize){b.width=Math.max(.025,Math.min(1-old.x,old.width+dx));b.height=Math.max(.025,Math.min(1-old.y,old.height+dy))}else{b.x=Math.max(0,Math.min(1-b.width,old.x+dx));b.y=Math.max(0,Math.min(1-b.height,old.y+dy))}renderBlurs()}function end(){e.target.removeEventListener("pointermove",move);e.target.removeEventListener("pointerup",end)}e.target.addEventListener("pointermove",move);e.target.addEventListener("pointerup",end)}
-$("addBlur").onclick=()=>{if(!$("preview").src)return alert("Video ဖိုင်အရင်ရွေးပါ");blurRegions.push({x:.1,y:.1,width:.25,height:.12,strength:50});selectedBlur=blurRegions.length-1;renderBlurs()};
-$("deleteBlur").onclick=()=>{if(selectedBlur>=0){blurRegions.splice(selectedBlur,1);selectedBlur=-1;renderBlurs()}};
-$("addSubtitle").onclick=()=>{let t=$("subText").value.trim(),s=+$("subStart").value,e=+$("subEnd").value;if(!t)return alert("စာတန်းရေးပါ");if(e<=s)return alert("ဆုံးချိန်က စချိန်ထက်နောက်ကျရပါမယ်");subtitles.push({text:t,start:s,end:e,size:+$("subSize").value,bottom:+$("subBottom").value});renderSubs()};
-function renderSubs(){ $("subtitleList").innerHTML=subtitles.map((s,i)=>`<div class="item"><div class="itemhead"><b>${i+1}. ${s.text.slice(0,45)}</b><button class="secondary small" data-subdel="${i}">ဖျက်</button></div><small>${s.start}s - ${s.end}s · ${s.size}px</small></div>`).join("");$("subtitleList").querySelectorAll("[data-subdel]").forEach(b=>b.onclick=()=>{subtitles.splice(+b.dataset.subdel,1);renderSubs()});updateSubPreview()}
-function updateSubPreview(){let t=$("preview").currentTime,s=subtitles.find(x=>t>=x.start&&t<=x.end);let p=$("subtitlePreview");p.textContent=s?s.text:"";if(s){p.style.fontSize=s.size+"px";p.style.bottom=s.bottom+"%"}}
+
+function extractText(d){
+ if(typeof d.output_text==="string"&&d.output_text.trim())return d.output_text.trim();
+ const out=[];
+ for(const s of (d.steps||[])){
+  for(const c of (s.content||[])){
+   if(typeof c.text==="string")out.push(c.text);
+   else if(c.type==="text"&&typeof c.text==="string")out.push(c.text);
+  }
+ }
+ return out.join("\n").trim();
+}async function uploadFile(f,key){
+ const start=await fetch("https://generativelanguage.googleapis.com/upload/v1beta/files",{
+  method:"POST",
+  headers:{"x-goog-api-key":key,"X-Goog-Upload-Protocol":"resumable","X-Goog-Upload-Command":"start","X-Goog-Upload-Header-Content-Length":String(f.size),"X-Goog-Upload-Header-Content-Type":f.type||"video/mp4","Content-Type":"application/json"},
+  body:JSON.stringify({file:{display_name:f.name}})
+ });
+ if(!start.ok)throw Error("Upload စတင်မရပါ: "+await start.text());
+ const uploadUrl=start.headers.get("x-goog-upload-url");
+ if(!uploadUrl)throw Error("Gemini Upload URL မရပါ");
+ const uploaded=await fetch(uploadUrl,{method:"POST",headers:{"x-goog-upload-command":"upload, finalize","x-goog-upload-offset":"0"},body:f});
+ if(!uploaded.ok)throw Error("Video Upload မအောင်မြင်ပါ: "+await uploaded.text());
+ return (await uploaded.json()).file;
+}
+async function waitActive(file,key){
+ for(let i=0;i<60;i++){
+  if(file.state==="ACTIVE")return file;
+  if(file.state==="FAILED")throw Error("Gemini က Video processing မအောင်မြင်ကြောင်း ပြန်ပေးခဲ့သည်။");
+  await new Promise(r=>setTimeout(r,3000));
+  const r=await fetch(API+"/"+file.name,{headers:{"x-goog-api-key":key}});
+  if(!r.ok)throw Error("Video အခြေအနေစစ်မရပါ: "+await r.text());
+  file=await r.json();
+ }
+ throw Error("Video processing အချိန်ကြာနေပါတယ်။ ခဏနောက်မှ ပြန်စမ်းပါ။");
+}
+$("generate").onclick=async()=>{
+ const key=$("apiKey").value.trim();
+ if(!key)return msg("Gemini API Key ထည့်ပါ","error");
+ try{
+  $("generate").disabled=true;
+  let videoPart;
+  if(mode==="file"){
+   const f=$("videoFile").files[0];if(!f)throw Error("Video ဖိုင်ရွေးပါ");
+   msg("Video Upload လုပ်နေပါတယ်...");
+   const uploaded=await waitActive(await uploadFile(f,key),key);
+   videoPart={type:"video",uri:uploaded.uri,mime_type:uploaded.mimeType||f.type||"video/mp4"};
+  }else{
+   const u=$("ytUrl").value.trim();
+   if(!/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(u))throw Error("YouTube URL မှန်ကန်စွာထည့်ပါ");
+   videoPart={type:"video",uri:u};
+  }
+  msg("AI Script ရေးနေပါတယ်...");
+  const prompt=`သင်သည် Movie Recap ဇာတ်လမ်းပြောသူဖြစ်သည်။ ပေးထားသောဗီဒီယိုကို လေ့လာပြီး ${$("language").value} ဘာသာဖြင့် ${$("style").value} ပုံစံရေးပါ။ ဇာတ်လမ်းပြောမည့်စာသားသက်သက်သာ ထုတ်ပါ။ ဗီဒီယိုထဲမပါသောအဖြစ်အပျက် မတီထွင်ပါနှင့်။ ဇာတ်ကောင်အမည်မသေချာလျှင် မတီထွင်ပါနှင့်။ သဘာဝကျသောစကားပြောပုံစံဖြင့်ရေးပါ။ ထပ်ဆောင်းညွှန်ကြားချက်: ${$("extra").value||"မရှိပါ"}`;
+  const response=await fetch(API+"/interactions",{method:"POST",headers:{"x-goog-api-key":key,"Content-Type":"application/json"},body:JSON.stringify({model:"gemini-3.1-flash-lite",input:[videoPart,{type:"text",text:prompt}]})});
+  const data=await response.json();
+  if(!response.ok)throw Error(data.error?.message||JSON.stringify(data));
+  scriptText=extractText(data);
+  if(!scriptText)throw Error("API က Script စာသားမပြန်ပေးပါ။ Response: "+JSON.stringify(data).slice(0,1200));
+  $("result").textContent=scriptText;msg("Script ရပါပြီ","ok");
+ }catch(e){msg("အမှား: "+e.message,"error");}
+ finally{$("generate").disabled=false;}
+};
+
+$("copy").onclick=async()=>{
+ if(!scriptText)return msg("Script မရှိသေးပါ");
+ try{await navigator.clipboard.writeText(scriptText);msg("Copy လုပ်ပြီးပါပြီ","ok");}
+ catch(e){const ta=document.createElement("textarea");ta.value=scriptText;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();msg("Copy လုပ်ပြီးပါပြီ","ok");}
+};
+$("download").onclick=()=>{
+ if(!scriptText)return msg("Script မရှိသေးပါ");
+ const url=URL.createObjectURL(new Blob([scriptText],{type:"text/plain;charset=utf-8"}));
+ const a=document.createElement("a");a.href=url;a.download="movie-recap.txt";a.click();setTimeout(()=>revokeUrl(url),1000);
+};
+
+$("makeMp3").onclick=async()=>{
+ if(!scriptText)return msg("Script အရင်ထုတ်ပါ");
+ try{  $("makeMp3").disabled=true;msg("MP3 ဖန်တီးနေပါတယ်...");
+  const r=await fetch(BACKEND+"/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:scriptText,voice:$("ttsVoice").value,rate:$("ttsRate").value})});
+  if(!r.ok)throw Error(await r.text());
+  const blob=await r.blob();if(!blob.size)throw Error("Backend က MP3 အလွတ်ပြန်ပေးပါတယ်");
+  ttsBlob=blob;audioFile=new File([blob],"recap.mp3",{type:"audio/mpeg"});
+  revokeUrl(mp3Url);mp3Url=URL.createObjectURL(blob);
+  const audio=$("ttsAudio");audio.src=mp3Url;audio.classList.remove("hidden");
+  const a=document.createElement("a");a.href=mp3Url;a.download="movie-recap-myanmar.mp3";a.click();
+  msg("MP3 အဆင်သင့်ပါပြီ","ok");
+ }catch(e){msg("MP3 မရပါ: "+e.message,"error");}
+ finally{$("makeMp3").disabled=false;}
+};
+
+function setVideoFile(file){
+ if(!file)return;
+ if(!file.type.startsWith("video/")){setStatus("exportStatus","Video ဖိုင်အမျိုးအစား မမှန်ပါ","error");return;}
+ editFile=file;revokeUrl(videoUrl);videoUrl=URL.createObjectURL(file);
+ const video=$("preview");video.pause();video.src=videoUrl;video.load();
+ $("previewWrap").classList.remove("hidden");
+ blurRegions=[];selectedBlur=-1;subtitles=[];renderBlurs();renderSubs();
+ video.onloadedmetadata=()=>{videoDuration=Number.isFinite(video.duration)?video.duration:0;setStatus("exportStatus",`Video တင်ပြီးပါပြီ${videoDuration?` · ကြာချိန် ${videoDuration.toFixed(1)} စက္ကန့်`:""}`,"ok");};
+ video.onerror=()=>setStatus("exportStatus","ဒီ Browser မှာ Video ဖိုင်ကို Preview မပြနိုင်ပါ။ အခြား MP4 (H.264) ဖိုင်ဖြင့် စမ်းပါ။","error");
+}
+$("editVideo").addEventListener("change",e=>setVideoFile(e.target.files[0]));
+$("videoFile").addEventListener("change",e=>{const f=e.target.files[0];if(f){$("editVideo").files=e.target.files;setVideoFile(f);}});
+
+function renderBlurs(){
+ const ov=$("overlay");
+ ov.querySelectorAll(".blurbox").forEach(el=>el.remove());
+ blurRegions.forEach((b,i)=>{
+  const el=document.createElement("div");el.className="blurbox"+(i===selectedBlur?" selected":"");
+  el.style.left=(b.x*100)+"%";el.style.top=(b.y*100)+"%";el.style.width=(b.width*100)+"%";el.style.height=(b.height*100)+"%";
+  el.style.setProperty("--blur-strength",Math.max(1,b.strength/4)+"px");
+  el.innerHTML=`<span class="tag">Blur ${i+1}</span><span class="handle"></span>`;
+  ov.appendChild(el);
+  el.addEventListener("pointerdown",e=>{if(e.target.classList.contains("handle"))return;selectedBlur=i;renderBlurs();const target=ov.querySelectorAll(".blurbox")[i];startBlurDrag(e,i,false,target);});
+  el.querySelector(".handle").addEventListener("pointerdown",e=>{e.stopPropagation();selectedBlur=i;startBlurDrag(e,i,true,el);});
+ });
+ $("blurList").innerHTML=blurRegions.map((b,i)=>`<div class="item"><div class="itemhead"><b>Blur ${i+1}</b><button class="secondary small" type="button" data-del="${i}">ဖျက်</button></div><label>Blur အား (${b.strength})</label><input type="range" min="1" max="100" value="${b.strength}" data-strength="${i}"></div>`).join("");
+ $("blurList").querySelectorAll("[data-del]").forEach(btn=>btn.onclick=()=>{blurRegions.splice(+btn.dataset.del,1);selectedBlur=-1;renderBlurs();});
+ $("blurList").querySelectorAll("[data-strength]").forEach(input=>input.oninput=()=>{const i=+input.dataset.strength;blurRegions[i].strength=+input.value;input.previousElementSibling.textContent="Blur အား ("+input.value+")";const box=ov.querySelectorAll(".blurbox")[i];if(box)box.style.setProperty("--blur-strength",Math.max(1,+input.value/4)+"px");});
+}
+function startBlurDrag(e,index,resize,element){
+ e.preventDefault();e.stopPropagation();
+ const ov=$("overlay"),rect=ov.getBoundingClientRect(),b=blurRegions[index],startX=e.clientX,startY=e.clientY,original={...b};
+ try{element.setPointerCapture(e.pointerId);}catch(_){}
+ const move=ev=>{
+  const dx=(ev.clientX-startX)/rect.width,dy=(ev.clientY-startY)/rect.height;
+  if(resize){b.width=Math.max(22/rect.width,Math.min(1-original.x,original.width+dx));
+   b.height=Math.max(18/rect.height,Math.min(1-original.y,original.height+dy));
+  }else{
+   b.x=Math.max(0,Math.min(1-b.width,original.x+dx));
+   b.y=Math.max(0,Math.min(1-b.height,original.y+dy));
+  }
+  element.style.left=(b.x*100)+"%";element.style.top=(b.y*100)+"%";element.style.width=(b.width*100)+"%";element.style.height=(b.height*100)+"%";
+ };
+ const end=()=>{element.removeEventListener("pointermove",move);element.removeEventListener("pointerup",end);element.removeEventListener("pointercancel",end);};
+ element.addEventListener("pointermove",move);element.addEventListener("pointerup",end);element.addEventListener("pointercancel",end);
+}
+$("addBlur").onclick=()=>{
+ if(!$("preview").src||!editFile)return alert("Video ဖိုင်အရင်ရွေးပါ");
+ blurRegions.push({x:.1,y:.1,width:.25,height:.12,strength:50});selectedBlur=blurRegions.length-1;renderBlurs();
+};
+$("deleteBlur").onclick=()=>{if(selectedBlur>=0){blurRegions.splice(selectedBlur,1);selectedBlur=-1;renderBlurs();}};
+
+$("addSubtitle").onclick=()=>{
+ const text=$("subText").value.trim(),start=Number($("subStart").value),end=Number($("subEnd").value),size=Number($("subSize").value),bottom=Number($("subBottom").value);
+ if(!text)return alert("စာတန်းရေးပါ");
+ if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||end<=start)return alert("စချိန်နှင့်ဆုံးချိန် မှန်ကန်စွာထည့်ပါ");
+ if(videoDuration&&end>videoDuration)return alert("စာတန်းဆုံးချိန်သည် Video ကြာချိန်ထက် မကျော်ရပါ");
+ if(!Number.isFinite(size)||size<12||size>80||!Number.isFinite(bottom)||bottom<0||bottom>90)return alert("စာလုံးအရွယ် သို့မဟုတ် အောက်ခြေအကွာအဝေး မမှန်ပါ");
+ subtitles.push({text,start,end,size,bottom});renderSubs();
+};
+function renderSubs(){
+ $("subtitleList").innerHTML=subtitles.map((s,i)=>`<div class="item"><div class="itemhead"><b>${i+1}. ${escapeHtml(s.text.slice(0,45))}</b><button class="secondary small" type="button" data-subdel="${i}">ဖျက်</button></div><small>${s.start}s - ${s.end}s · ${s.size}px</small></div>`).join("");
+ $("subtitleList").querySelectorAll("[data-subdel]").forEach(btn=>btn.onclick=()=>{subtitles.splice(+btn.dataset.subdel,1);renderSubs();});
+ updateSubPreview();
+}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
+function updateSubPreview(){
+ const t=$("preview").currentTime||0,s=subtitles.find(x=>t>=x.start&&t<=x.end),p=$("subtitlePreview");
+ p.textContent=s?s.text:"";
+ if(s){p.style.fontSize=`clamp(12px, ${s.size/7}vw, ${s.size}px)`;p.style.bottom=s.bottom+"%";}
+}
 $("preview").addEventListener("timeupdate",updateSubPreview);
-$("exportMp4").onclick=async()=>{if(!editFile)return $("exportStatus").textContent="Video ဖိုင်ရွေးပါ";if(!audioFile)return $("exportStatus").textContent="MP3 အသံအရင်ထုတ်ပါ";try{$("exportMp4").disabled=true;$("exportStatus").textContent="MP4 Render လုပ်နေပါတယ်။ Video အရွယ်အစားအလိုက် အချိန်ယူနိုင်ပါတယ်။";let fd=new FormData();fd.append("video",editFile);fd.append("audio",audioFile);fd.append("blur_regions",JSON.stringify(blurRegions));fd.append("subtitles",JSON.stringify(subtitles));fd.append("audio_offset",$("audioOffset").value);fd.append("audio_tempo",$("audioTempo").value);let r=await fetch(BACKEND+"/api/render-mp4",{method:"POST",body:fd});if(!r.ok)throw Error(await r.text());let blob=await r.blob(),url=URL.createObjectURL(blob);let a=$("downloadMp4");a.href=url;a.classList.remove("hidden");a.textContent="⬇ MP4 ဖိုင်ဒေါင်းလုဒ်လုပ်ရန်";a.click();$("exportStatus").textContent="MP4 ပြီးပါပြီ။","ok"}catch(e){$("exportStatus").textContent="Export မအောင်မြင်ပါ: "+e.message}finally{$("exportMp4").disabled=false}};
-</script></body></html>
+$("preview").addEventListener("seeked",updateSubPreview);
+
+$("exportMp4").onclick=async()=>{if(!editFile){setStatus("exportStatus","MP4 Export အတွက် Video ဖိုင်ရွေးပါ","error");return;}
+ if(!audioFile){setStatus("exportStatus","MP3 အသံအရင်ထုတ်ပါ","error");return;}
+ try{
+  $("exportMp4").disabled=true;setStatus("exportStatus","MP4 Render လုပ်နေပါတယ်။ Video အရွယ်အစားအလိုက် အချိန်ယူနိုင်ပါတယ်...");
+  const fd=new FormData();fd.append("video",editFile,editFile.name);fd.append("audio",audioFile,"recap.mp3");
+  fd.append("blur_regions",JSON.stringify(blurRegions));fd.append("subtitles",JSON.stringify(subtitles));
+  fd.append("audio_offset",String(Number($("audioOffset").value)||0));fd.append("audio_tempo",String(Number($("audioTempo").value)||1));
+  const r=await fetch(BACKEND+"/api/render-mp4",{method:"POST",body:fd});
+  if(!r.ok){let detail=await r.text();throw Error(detail||`HTTP ${r.status}`);}
+  const blob=await r.blob();if(!blob.size)throw Error("Backend က MP4 အလွတ်ပြန်ပေးပါတယ်");
+  revokeUrl(mp4Url);mp4Url=URL.createObjectURL(blob);
+  const a=$("downloadMp4");a.href=mp4Url;a.classList.remove("hidden");a.textContent="⬇ MP4 ဖိုင်ဒေါင်းလုဒ်လုပ်ရန်";a.click();
+  setStatus("exportStatus","MP4 ပြီးပါပြီ။","ok");
+ }catch(e){setStatus("exportStatus","Export မအောင်မြင်ပါ: "+e.message,"error");}
+ finally{$("exportMp4").disabled=false;}
+};
+window.addEventListener("beforeunload",()=>{revokeUrl(videoUrl);revokeUrl(mp3Url);revokeUrl(mp4Url);});
+</script>
+</body>
+</html>
