@@ -57,21 +57,40 @@ async def health():
 async def text_to_speech(payload: TTSRequest):
     if payload.voice not in ALLOWED_VOICES:
         raise HTTPException(status_code=400, detail="Unsupported voice")
-    if payload.rate not in {"+0%", "+5%", "+10%", "+15%", "+20%"}:
+
+    if payload.rate not in {"-10%", "-5%", "+0%", "+5%", "+10%"}:
         raise HTTPException(status_code=400, detail="Unsupported speech rate")
+
+    if payload.pitch not in {"-5Hz", "+0Hz", "+5Hz"}:
+        raise HTTPException(status_code=400, detail="Unsupported pitch")
+
+    if payload.volume not in {"+0%", "+5%", "+10%"}:
+        raise HTTPException(status_code=400, detail="Unsupported volume")
+
     try:
-        communicate = edge_tts.Communicate(payload.text, payload.voice, rate=payload.rate)
+        communicate = edge_tts.Communicate(
+            payload.text,
+            payload.voice,
+            rate=payload.rate,
+            pitch=payload.pitch,
+            volume=payload.volume
+        )
+
         audio = io.BytesIO()
+
         async for chunk in communicate.stream():
             if chunk["type"] == "audio":
                 audio.write(chunk["data"])
+
         if audio.tell() == 0:
             raise RuntimeError("No audio was returned")
+
         return Response(
             audio.getvalue(),
             media_type="audio/mpeg",
             headers={"Content-Disposition": "attachment; filename=voice.mp3"},
         )
+
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"TTS failed: {exc}")
 
