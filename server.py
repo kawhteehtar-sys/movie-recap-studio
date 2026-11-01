@@ -76,7 +76,10 @@ async def render_mp4(video: UploadFile = File(...), audio: UploadFile = File(...
             px=max(0,min(width-2,int(x*width))); py=max(0,min(height-2,int(y*height)))
             pw=max(2,min(width-px,int(w*width))); ph=max(2,min(height-py,int(h*height)))
             px-=px%2; py-=py%2; pw=max(2,pw-pw%2); ph=max(2,ph-ph%2)
-            radius=max(1,min(50,int(strength/2)))
+            # Blur radius ကို Crop အရွယ်အစားအလိုက် အလိုအလျောက် ကန့်သတ်ခြင်း
+max_radius = max(1, (min(pw, ph) - 1) // 2)
+requested_radius = max(1, min(50, int(strength / 2)))
+radius = min(requested_radius, max_radius)
             filters += [f"{current}split=2[b{i}][c{i}]",
                         f"[c{i}]crop={pw}:{ph}:{px}:{py},boxblur={radius}:2[z{i}]",
                         f"[b{i}][z{i}]overlay={px}:{py}[v{i}]"]
