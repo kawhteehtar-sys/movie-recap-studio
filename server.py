@@ -163,13 +163,22 @@ Rules:
 
 
 async def make_tts_bytes(text: str, voice: str):
-    stream = edge_tts.Communicate(text, voice=voice, rate="+0%")
+    stream = edge_tts.Communicate(
+        text,
+        voice=voice,
+        rate="+0%",
+        pitch="+0Hz",
+        volume="+5%"
+    )
     buf = io.BytesIO()
+
     async for item in stream.stream():
         if item["type"] == "audio":
             buf.write(item["data"])
+
     if not buf.tell():
         raise RuntimeError("TTS က အသံအလွတ်ပြန်ပေးပါတယ်")
+
     return buf.getvalue()
 
 
