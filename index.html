@@ -175,9 +175,48 @@ $("generate").onclick=async()=>{
   }
   msg("AI Script ရေးနေပါတယ်...");
   const prompt=`သင်သည် Movie Recap ဇာတ်လမ်းပြောသူဖြစ်သည်။ ပေးထားသောဗီဒီယိုကို လေ့လာပြီး ${$("language").value} ဘာသာဖြင့် ${$("style").value} ပုံစံရေးပါ။ ဇာတ်လမ်းပြောမည့်စာသားသက်သက်သာ ထုတ်ပါ။ ဗီဒီယိုထဲမပါသောအဖြစ်အပျက် မတီထွင်ပါနှင့်။ ဇာတ်ကောင်အမည်မသေချာလျှင် မတီထွင်ပါနှင့်။ သဘာဝကျသောစကားပြောပုံစံဖြင့်ရေးပါ။ ထပ်ဆောင်းညွှန်ကြားချက်: ${$("extra").value||"မရှိပါ"}`;
-  const response=await fetch(API+"/interactions",{method:"POST",headers:{"x-goog-api-key":key,"Content-Type":"application/json"},body:JSON.stringify({model:"gemini-3.1-flash-lite",input:[videoPart,{type:"text",text:prompt}]})});
-  const data=await response.json();
-  if(!response.ok)throw Error(data.error?.message||JSON.stringify(data));
+  const models = [
+  "gemini-3.1-flash-lite",
+  "gemini-3.6-flash",
+  "gemini-3.8-flash",
+  "gemini-3.5-flash-lite"
+];
+
+let data = null;
+let lastError = "";
+
+for (const model of models) {
+  const response = await fetch(API + "/interactions", {
+    method: "POST",
+    headers: {
+      "x-goog-api-key": key,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      input: [
+        videoPart,
+        { type: "text", text: prompt }
+      ]
+    })
+  });
+
+  data = await response.json();
+
+  if (response.ok) break;
+
+  lastError = data.error?.message || JSON.stringify(data);
+
+  if (![429, 500, 502, 503, 504].includes(response.status)) {
+    throw Error(lastError);
+  }
+
+  data = null;
+}
+
+if (!data) {
+  throw Error("Gemini Model ၄ ခုလုံး မအောင်မြင်ပါ။ " + lastError);
+}
   scriptText=extractText(data);
   if(!scriptText)throw Error("API က Script စာသားမပြန်ပေးပါ။ Response: "+JSON.stringify(data).slice(0,1200));
   $("result").textContent=scriptText;msg("Script ရပါပြီ","ok");
