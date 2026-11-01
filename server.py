@@ -287,7 +287,7 @@ async def auto_dub(
                 ])
                 speech_path = fitted
             input_index = len(inputs)
-            inputs.append(speech_path)
+            inputs.append(speech_path)        
             label = f"a{idx}"
             delay_ms = int(seg["start"] * 1000)
             filters.append(
